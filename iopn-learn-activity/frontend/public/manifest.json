@@ -1,0 +1,11 @@
+{
+  "name": "IOPn Learn",
+  "description": "Learn IOPn, Unlock the Future - Interactive lessons and quizzes",
+  "version": "1.0.0",
+  "type": "discord_activity",
+  "configuration": {
+    "max_participants": 1,
+    "supports_voice": false,
+    "requires_age_gate": false
+  }
+}
