@@ -1,0 +1,42 @@
+{
+  "lessons": {
+    "intro-to-iopn": {
+      "title": "Introduction to IOPn",
+      "questions": [
+        {
+          "id": "q1",
+          "question": "What is the primary mission of IOPn?",
+          "options": [
+            { "id": "a", "text": "To create a decentralized ecosystem for digital innovation" },
+            { "id": "b", "text": "To replace traditional banking systems" },
+            { "id": "c", "text": "To mine cryptocurrency" },
+            { "id": "d", "text": "To create social media platforms" }
+          ],
+          "correct": "a"
+        },
+        {
+          "id": "q2",
+          "question": "What blockchain does IOPn operate on?",
+          "options": [
+            { "id": "a", "text": "Ethereum" },
+            { "id": "b", "text": "OPN Chain" },
+            { "id": "c", "text": "Bitcoin" },
+            { "id": "d", "text": "Solana" }
+          ],
+          "correct": "b"
+        },
+        {
+          "id": "q3",
+          "question": "What is the native token of the IOPn ecosystem?",
+          "options": [
+            { "id": "a", "text": "IOPn" },
+            { "id": "b", "text": "OPN" },
+            { "id": "c", "text": "REP" },
+            { "id": "d", "text": "PULSE" }
+          ],
+          "correct": "b"
+        }
+      ]
+    }
+  }
+}
