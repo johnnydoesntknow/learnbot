@@ -1,0 +1,266 @@
+Project Structure
+iopn-learn-activity/
+├── backend/           # Node.js/Express API server
+│   ├── api/          # API endpoints
+│   ├── bot/          # Discord bot
+│   ├── data/         # Weekly content configuration
+│   ├── scripts/      # Database management scripts
+│   └── sql/          # Database schema
+└── frontend/         # React/Vite web application
+    ├── src/
+    └── public/
+        └── videos/   # Video content storage
+Quick Start
+Prerequisites
+
+Node.js (v16+)
+MySQL (v8+)
+Discord Application/Bot Token
+Yarn or npm
+
+Installation
+
+Clone and Install Dependencies
+
+bash# Install backend dependencies
+cd backend
+yarn install
+
+# Install frontend dependencies
+cd ../frontend
+yarn install
+
+Configure Environment Variables
+
+Create backend/.env:
+env# Discord Configuration
+DISCORD_BOT_TOKEN=your_bot_token_here
+DISCORD_CLIENT_ID=your_client_id_here
+
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=iopn_learn
+
+# Security
+JWT_SECRET=your_secret_key_here
+
+# REP Points Configuration
+REP_POINTS_PASS=30
+REP_POINTS_FAIL=0
+REP_POINTS_PERFECT_SCORE=50
+PASSING_SCORE=70
+MAX_QUIZ_ATTEMPTS=3
+
+# Tunnel URL (when using Cloudflare tunnel)
+TUNNEL_URL=https://your-tunnel.trycloudflare.com
+
+Setup Database
+
+bash# cd backend
+yarn db:setup    # Creates database and schema
+
+Start Services
+
+bash# Terminal 1 - Backend API
+cd backend
+yarn dev
+
+# Terminal 2 - Discord Bot
+cd backend
+yarn bot
+
+# Terminal 3 - Frontend
+cd frontend
+yarn dev
+
+# Terminal 4 - Cloudflare Tunnel (for Discord integration)
+npx cloudflared tunnel --url http://localhost:5173
+📝 Updating Weekly Content (Most Important!)
+Content Location
+All lesson and quiz content is managed in ONE FILE:
+backend/data/weeklyContent.js
+Content Structure
+The weeklyContent.js file contains:
+
+Week information (number, theme, date)
+Lessons (3 lessons per week)
+Quizzes (1 quiz per lesson with 3 questions each)
+
+How to Update Content for a New Week
+
+Open the file: backend/data/weeklyContent.js
+Update week information:
+
+javascriptmodule.exports = {
+  weekNumber: 2,  // Change from 1 to 2, 3, 4, etc.
+  weekTheme: 'Advanced IOPn Concepts',  // Your week's theme
+  lastUpdated: '2025-01-27',  // Current date
+
+Update lessons (keep IDs as lesson-1, lesson-2, lesson-3):
+
+javascriptlessons: [
+  {
+    id: 'lesson-1',  // ⚠️ NEVER CHANGE THIS ID
+    title: 'Smart Contracts on IOPn',  // ✅ Change weekly
+    description: 'Learn how smart contracts work',  // ✅ Change weekly
+    contentType: 'video',  // Options: 'video', 'text', 'image', 'images'
+    mediaPath: '/videos/week2/smart-contracts.mp4',  // ✅ Update path
+    content: 'Fallback text content here...',  // ✅ Update content
+    duration: '7 min',
+    orderIndex: 1
+  },
+  // ... lesson-2 and lesson-3
+]
+
+Update quiz questions:
+
+javascriptquizzes: {
+  'lesson-1': {  // ⚠️ Key must match lesson ID
+    title: 'Smart Contracts Quiz',  // ✅ Change weekly
+    passingScore: 70,
+    questions: [
+      {
+        id: 'q1',
+        question: 'What is a smart contract?',  // ✅ Your question
+        options: [
+          { id: 'a', text: 'Self-executing code on blockchain' },
+          { id: 'b', text: 'A legal document' },
+          { id: 'c', text: 'A type of cryptocurrency' },
+          { id: 'd', text: 'A mining algorithm' }
+        ],
+        correct: 'a'  // ✅ Set correct answer
+      },
+      // ... q2 and q3
+    ]
+  },
+  // ... quizzes for lesson-2 and lesson-3
+}
+Adding Media Content
+Videos
+
+Place video files in: frontend/public/videos/
+Recommended format: MP4 (H.264)
+Update mediaPath in weeklyContent.js:
+
+javascriptmediaPath: '/videos/week2/intro.mp4'
+Images
+
+Place images in: frontend/public/images/
+For single image:
+
+javascriptcontentType: 'image',
+mediaPath: '/images/week2/diagram.png'
+
+For multiple images (slideshow):
+
+javascriptcontentType: 'images',
+mediaPath: [
+  '/images/week2/slide1.png',
+  '/images/week2/slide2.png',
+  '/images/week2/slide3.png'
+]
+Applying Content Updates
+After editing weeklyContent.js:
+
+Save the file
+Backend automatically syncs on restart (Ctrl+C and restart)
+Or manually sync:
+
+bashcd backend
+node scripts/sync-content-to-db.js
+You should see:
+✅ Synced lesson: lesson-1
+✅ Synced lesson: lesson-2
+✅ Synced lesson: lesson-3
+✅ Synced quiz: lesson-1
+✅ Synced quiz: lesson-2
+✅ Synced quiz: lesson-3
+Database Management
+Reset Everything (Development Only)
+bashcd backend
+yarn db:reset    # Drops entire database
+yarn db:setup     # Recreates schema
+Clear User Progress (Keep Content)
+sqlmysql -u root -p
+USE iopn_learn;
+TRUNCATE TABLE quiz_attempts;
+TRUNCATE TABLE user_quiz_completions;
+TRUNCATE TABLE user_lesson_progress;
+UPDATE user_points SET rep_points = 0, pulse_points = 0, level = 1;
+Check User Progress
+sqlSELECT u.username, up.rep_points, up.level 
+FROM users u 
+JOIN user_points up ON u.id = up.user_id;
+Important Notes
+Content Guidelines
+
+ALWAYS keep lesson IDs as lesson-1, lesson-2, lesson-3
+Each quiz MUST have exactly 3 questions
+Each question MUST have 4 options (a, b, c, d)
+Videos should be under 100MB for smooth loading
+Images should be under 2MB each
+
+REP Points System
+
+Passing (70%+): 30 REP points
+Perfect Score (100%): 50 REP points
+Failed: 0 REP points
+Users get 3 attempts per quiz
+
+Weekly Update Checklist
+
+ Update weekNumber in weeklyContent.js
+ Update weekTheme
+ Update all 3 lesson titles and descriptions
+ Update all 9 quiz questions (3 per lesson)
+ Add media files to frontend/public/
+ Update mediaPath references
+ Restart backend server
+ Verify sync completed successfully
+
+Troubleshooting
+"Quiz not found for this lesson"
+
+Run: node backend/scripts/sync-content-to-db.js
+Check MySQL: SELECT * FROM quizzes;
+
+REP Points not updating
+
+Check: SELECT * FROM user_points;
+Verify passing score in .env (default 70%)
+
+Videos not loading
+
+Check file exists in frontend/public/videos/
+Verify mediaPath in weeklyContent.js starts with /videos/
+
+Database out of sync
+bashcd backend
+# Nuclear option - resets everything
+mysql -u root -p
+sqlDROP DATABASE iopn_learn;
+CREATE DATABASE iopn_learn;
+exit;
+bashyarn db:setup
+node scripts/sync-content-to-db.js
+Production Deployment
+
+Set NODE_ENV=production
+Use proper MySQL credentials
+Secure JWT_SECRET
+Set up proper domain instead of Cloudflare tunnel
+Consider CDN for video content
+Implement backup strategy for database
+
+Support
+For issues or questions, check:
+
+Database logs: backend/logs/
+Frontend console for client errors
+Backend terminal for API errors
+MySQL for data verification
+
+Remember: All content updates happen in backend/data/weeklyContent.js - that's the single source of truth for lessons and quizzes!
